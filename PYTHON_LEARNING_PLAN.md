@@ -298,11 +298,22 @@ with open("targets.txt", "r") as f:
 4. **集合无序** — 打印顺序可能每次不同，需要有序就 `sorted()`
 5. **f-string 嵌套引号** — `f"{d.get(x,"y")}"` 只有 Python 3.12+ 能跑，**一律用「外双内单」**
 
+### 已完成：GitHub 仓库 ✅
+
+- [x] GitHub 仓库创建：https://github.com/zzx-724/python-for-security
+- [x] 首次提交并推送（11 个文件，1849 行）
+
+**日常更新流程**（每次学完跑一遍）：
+
+```bash
+git add .
+git commit -m "Day 4: 循环与列表推导式"
+git push
+```
+
 ### 待完成 ⬜
 
 - [ ] Day 4：条件/循环/列表推导式（`04_scanning_logic.py`）
-- [ ] 注册 GitHub 账号，创建仓库 `python-for-security`
-- [ ] 把代码 push 上去
 
 ---
 
