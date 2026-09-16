@@ -1,0 +1,24 @@
+# Python 运行产生的缓存文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+.venv/
+env/
+
+# 编辑器本地配置
+.vscode/
+.idea/
+
+# 本机工具配置（不上传）
+.claude/
+
+# 练习时产生的临时输出文件
+output/
+*.log
+
+# Windows 系统文件
+Thumbs.db
+desktop.ini
