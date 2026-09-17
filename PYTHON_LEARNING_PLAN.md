@@ -222,7 +222,7 @@ with open("targets.txt", "r") as f:
 ## 七、学习进度追踪
 
 > 开始日期：2026-09-10
-> 当前阶段：阶段一 · Day 4 进行中
+> 当前阶段：阶段一 · Day 4 已完成，准备进入 Day 5
 
 ### 已完成 ✅
 
@@ -233,6 +233,8 @@ with open("targets.txt", "r") as f:
 | 09-11 | Day 1 完成：条件判断 | if/elif/else 掌握，端口服务识别 + 风险评估练习 ✅ |
 | 09-14 | Day 2 完成：字符串操作 | 切片/find/split/join/replace/strip/编解码全部掌握，完成 URL 解析 + Payload 生成 3 个练习 ✅ |
 | 09-16 | Day 3 完成：列表/字典/集合 | 四种容器全掌握，3 个练习全通过（含去重扫描结果合并）✅ |
+| 09-18 | Day 4 完成：循环与推导式 | for/range/while/enumerate/zip/推导式全掌握，4 个练习通过 ✅ |
+| 09-18 | 学会 git | `add`→`commit`→`push` 流程独立完成，理解暂存区与"分批提交" |
 
 ### Day 1 进度：变量、类型、print/input
 
@@ -298,6 +300,31 @@ with open("targets.txt", "r") as f:
 4. **集合无序** — 打印顺序可能每次不同，需要有序就 `sorted()`
 5. **f-string 嵌套引号** — `f"{d.get(x,"y")}"` 只有 Python 3.12+ 能跑，**一律用「外双内单」**
 
+### Day 4 进度：循环与推导式
+
+| 知识点 | 状态 | 笔记 |
+|--------|:--:|------|
+| `for` 循环 | ✅ | 直接遍历元素，不用管索引（对比 C 的 `i`） |
+| `range()` | ✅ | **含头不含尾**！`range(1,11)` → 1~10，对应 C 的 `i <= 10` |
+| `while` 循环 | ✅ | 不知道循环几次时用；**别忘递增变量，否则死循环** |
+| `break` / `while...else` | ✅ | `else` 只在"没被 break"时执行（冷门语法） |
+| `enumerate()` | ✅ | 产出 `(序号, 元素)` 元组，**第一个变量接序号** |
+| `zip()` | ✅ | 配对遍历，**顺序 = 传参顺序**；长度不同以短的为准 |
+| 嵌套解包 | ✅ | `for i, (a, b) in enumerate(zip(X, Y), 1)` —— 变量形状要匹配数据形状 |
+| 嵌套循环 | ✅ | 外层 1 次 = 内层转满一轮（2×3=6 行） |
+| 列表推导式 | ✅ | `[p for p in lst if 条件]`，读法：从中间往两边 |
+| 字典推导式 | ✅ | `{k: v for k in lst}` |
+| 嵌套推导式 | ✅ | 两个 for，顺序和嵌套循环一致 |
+| 格式说明符 | ✅ | `{port:6d}` 宽度右对齐、`{ip:<15}` 左对齐、`{rate:.2f}` 小数 |
+
+### Day 4 踩过的坑（重要）
+
+1. **`==` vs `in`** — `port == (80,443)` 永远 False（一个数字不等于一个元组）；要判断"是其中之一"必须用 `in`。**这个 bug 不报错，只是静默少输出**
+2. **`range(1, 11)` 不是 `range(1, 10)`** — 含头不含尾，写成 10 会少扫一个 IP
+3. **enumerate/zip 变量写反不报错** — Python 只看位置不看名字，名字写反了程序照跑但数据全错
+4. **`commit` ≠ `push`** — commit 只存本地，忘了 push 时 `git status` 会显示 `[ahead 1]`
+5. **嵌套解包要加括号** — `for i, (a, b) in ...`，不加会 `ValueError: not enough values to unpack`
+
 ### 已完成：GitHub 仓库 ✅
 
 - [x] GitHub 仓库创建：https://github.com/zzx-724/python-for-security
@@ -313,11 +340,12 @@ git push
 
 ### 待完成 ⬜
 
-- [ ] Day 4：条件/循环/列表推导式（`04_scanning_logic.py`）
+- [ ] 做完 `practice_02_enumerate_zip.py`（7 道专项练习 + 挑战题）
+- [ ] Day 5：函数 / 参数 / 异常处理（`06_crypto_basics.py` 之前先补函数）
 
 ---
 
-> 📝 进度：2026-09-16 已开始 Day 4（`04_scanning_logic.py`），for / range / while 已讲，下次从【推导式】继续
+> 📝 进度：2026-09-18 Day 4 已完成。下次：先做 `practice_02_enumerate_zip.py` 的练习，然后开始 Day 5 函数
 
 ---
 

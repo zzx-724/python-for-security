@@ -28,7 +28,8 @@ Python 语法速通      安全方向 Python 工具箱    实战项目积累
 ├── practice_01.py            # Day 1  条件判断 if/elif/else — 端口服务识别器
 ├── 02_string_toolkit.py      # Day 2  字符串操作、编码解码、Payload 生成
 ├── 03_data_structures.py     # Day 3  列表、元组、字典、集合
-├── 04_scanning_logic.py      # Day 4  条件、循环、推导式（进行中）
+├── 04_scanning_logic.py      # Day 4  循环、推导式、enumerate/zip
+├── practice_02_enumerate_zip.py  # Day 4 专项练习：enumerate 与 zip
 ├── 05_file_io.py             # Day 6  文件读写、JSON/CSV
 ├── 06_crypto_basics.py       # Day 5  哈希、Base64、对称加密
 ├── 07_info_gather.py         # Day 9  综合项目：简易信息收集工具
@@ -42,7 +43,7 @@ Python 语法速通      安全方向 Python 工具箱    实战项目积累
 | Day 1 | 变量、类型、print/input、条件判断 | ✅ |
 | Day 2 | 字符串操作、切片、编码解码 | ✅ |
 | Day 3 | 列表、元组、字典、集合 | ✅ |
-| Day 4 | 循环、列表推导式 | 🔄 |
+| Day 4 | 循环、推导式、enumerate/zip | ✅ |
 | Day 5-9 | 函数 / 文件IO / 模块 / 面向对象 / 综合项目 | ⬜ |
 
 详细进度、每个知识点的笔记和踩过的坑，见 [PYTHON_LEARNING_PLAN.md](PYTHON_LEARNING_PLAN.md)。
