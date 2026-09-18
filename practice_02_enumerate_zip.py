@@ -33,7 +33,8 @@ ports_1 = [21, 22, 80, 443, 3306, 8080]
 #   ...
 
 # === 你的代码写在这里 ===
-
+for i,port in enumerate(ports_1,1):
+    print(f"{i}. {port}")
 
 # ------------------------------------------------------------
 # 练习 2：找出目标端口排第几
@@ -49,7 +50,9 @@ target_port = 443
 #             print(...)
 
 # === 你的代码写在这里 ===
-
+for i,port in enumerate(ports_2,1):
+    if port == target_port:
+        print(f"{i}.{port}")
 
 # ------------------------------------------------------------
 # 练习 3：扫描报告 + 高危标记（enumerate + if + in）
@@ -70,7 +73,12 @@ high_risk = [21, 22, 3306]
 #   提示：端口那个字段用 {port:<6} 让它左对齐占 6 格，后面才不会抖
 
 # === 你的代码写在这里 ===
-
+print("\n")
+for i,port in enumerate(ports_3,1):
+    if port in high_risk:
+        print(f"{i}. {port:<6}🔴 高危")
+    else:
+      print(f"{i}. {port}")
 
 # ============================================================
 # 二、zip 练习
@@ -92,7 +100,8 @@ ports_4 = [80, 443, 8080]
 #   192.168.1.3:8080
 
 # === 你的代码写在这里 ===
-
+for ips,ports in zip(ips_4,ports_4):
+    print(f"{ips}:{ports}")
 
 # ------------------------------------------------------------
 # 练习 5：三个列表一起 zip（扫描结果表）
@@ -110,7 +119,9 @@ status_5 = ["open", "closed", "open"]
 #         IP 用 {ip:<15}，端口用 {port:<6}，让列对齐
 
 # === 你的代码写在这里 ===
-
+print("\n")
+for ips,port,status in zip(ips_5,ports_5,status_5):
+    print(f"{ips}    {port}    {status}")
 
 # ------------------------------------------------------------
 # 练习 6：端口 ↔ 服务对照表（对齐输出）
@@ -130,7 +141,11 @@ services_6 = ["SSH", "HTTP", "HTTPS", "MySQL", "HTTP-Proxy"]
 #   提示：端口用 {port:>4} 右对齐占 4 格；表头那行是普通字符串，不用 f-string
 
 # === 你的代码写在这里 ===
-
+print("\n")
+print("   PORT      SERVICE")
+print("   --------------------")
+for port,service in zip(ports_6,services_6):
+    print(f"   {port:>4}      {service}")
 
 # ============================================================
 # 三、综合练习（enumerate + zip 一起上）
@@ -159,7 +174,11 @@ open_counts = [3, 0, 5]
 #        也就是：i 接序号，(target, count) 接元组里拆出来的两个值
 
 # === 你的代码写在这里 ===
-
+for i,(target,count) in enumerate(zip(targets_7,open_counts),1):
+    if count == 0:
+        print(f"{i}. {target} → 无开放端口")
+    else:
+        print(f"{i}. {target} → 开放{count}个端口")
 
 # ------------------------------------------------------------
 # 挑战题：对比两次扫描，找出新增端口
@@ -180,7 +199,22 @@ scan_after = [22, 80, 443, 3306, 8080]
 #   提示：第 3 步可以先遍历 scan_after 的 enumerate，判断端口是否在新增集合里
 
 # === 你的代码写在这里 ===
+print("\n")
+scan_new = set(scan_after) - set(scan_before)
+print(scan_new)
+print(f"新增端口共 {len(scan_new)} 个:")
 
+'''
+原写法:
+for i,port in enumerate(scan_new,1):
+    print(f"{i}. {port}  （在扫描结果里排第 {scan_after.index(port) + 1} 位）")
+'''
+
+n = 0
+for pos, port in enumerate(scan_after,1):
+    if port in scan_new:
+        n += 1
+        print(f"  {n}. {port}  (在扫描结果里排第 {pos} 位)")
 
 # ============================================================
 # 参考答案（先自己写！写完再对照）

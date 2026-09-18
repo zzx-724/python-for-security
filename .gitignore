@@ -19,6 +19,14 @@ env/
 output/
 *.log
 
+# ⚠️ 脚本的运行产物 —— 绝不提交
+# 这些文件是跑脚本生成的，不是源代码。真实渗透场景里它们可能含
+# 客户的目标清单和扫描结果，一旦 push 就是重大信息泄露事故。
+targets.txt
+*_report.json
+*_report.csv
+scan_result*.txt
+
 # Windows 系统文件
 Thumbs.db
 desktop.ini

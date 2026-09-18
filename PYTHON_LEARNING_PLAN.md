@@ -235,6 +235,8 @@ with open("targets.txt", "r") as f:
 | 09-16 | Day 3 完成：列表/字典/集合 | 四种容器全掌握，3 个练习全通过（含去重扫描结果合并）✅ |
 | 09-18 | Day 4 完成：循环与推导式 | for/range/while/enumerate/zip/推导式全掌握，4 个练习通过 ✅ |
 | 09-18 | 学会 git | `add`→`commit`→`push` 流程独立完成，理解暂存区与"分批提交" |
+| 09-19 | Day 4 专项练习通过 | `practice_02_enumerate_zip.py` 7 题 + 挑战题全过 ✅ |
+| 09-19 | 修复 GitHub 推送失败 | 给 git 单独配代理，理解"命令行程序不读系统代理" |
 
 ### Day 1 进度：变量、类型、print/input
 
@@ -325,6 +327,43 @@ with open("targets.txt", "r") as f:
 4. **`commit` ≠ `push`** — commit 只存本地，忘了 push 时 `git status` 会显示 `[ahead 1]`
 5. **嵌套解包要加括号** — `for i, (a, b) in ...`，不加会 `ValueError: not enough values to unpack`
 
+### Day 4 专项练习：enumerate 与 zip
+
+`practice_02_enumerate_zip.py` —— 7 道专项练习 + 1 道挑战题，全部通过。
+
+| 练习 | 考点 | 结果 |
+|------|------|:--:|
+| 1-2 | `enumerate` 基本用法 + 条件筛选 | ✅ |
+| 3 | `enumerate` + `if/in` + `{port:<6}` 列对齐 | ✅ |
+| 4-5 | `zip` 两列表 / 三列表配对 | ✅ |
+| 6 | 表格对齐输出 `{port:>4}` | ✅ |
+| 7 | **嵌套解包** `for i,(a,b) in enumerate(zip(X,Y),1)` | ✅ |
+| 挑战 | 集合差集找新增端口 | ✅ |
+
+**挑战题的核心思维（重点）：同一个任务用两个容器，各司其职**
+
+| 容器 | 擅长 | 在这里的角色 |
+|------|------|-------------|
+| `set` | 快速判断"在不在" + 自动去重 | `set(after) - set(before)` 找出新增端口 |
+| `list` | **有序** | 遍历出"排第几位"和报告的序号 |
+
+**结论：要输出带序号的报告，必须遍历有序的 `list`，不能遍历 `set`。**
+（两个计数器也各有用处：`pos` 来自 `scan_after` 的遍历，`n` 是自己数的新增个数。）
+
+### Day 4 专项练习踩过的坑（重要）
+
+1. **`list` 没有 `.find()`** — `find` 是**字符串**方法（找不到返回 -1）；**列表**用 `.index()`（找不到**直接报错**）。
+   报错原文 `'list' object has no attribute 'find'` 已经把答案说了：**看到 `AttributeError` 先问"这个变量是什么类型"**
+2. **`[set(a) - set(b)]` 多套了方括号** — 方括号把集合装进列表，`len` 从 2 变成 1，报告数字全错。
+   **`[]` 是列表、`{}` 是集合，混用会"套娃"**
+3. **`.index()` 从 0 开始数（off-by-one）** — `[22,80,443,3306,8080].index(3306)` → `3`，但人眼看是第 4 位，**差 1**。
+   修法 `+1`。⚠️ 对比：`enumerate(x, 1)` 已经是从 1 开始，**不用再加**
+4. **集合无序 → 序号会乱** — 用 `enumerate(集合)` 出报告，顺序可能反了，甚至换台机器就不一样
+5. **循环变量覆盖原列表** — `for ips, ports_4 in zip(ips_4, ports_4)` 跑完后 `ports_4` 变成最后一个元素，
+   原列表没了。**循环变量用单数，和列表名区分开**
+6. **硬编码空格对不齐** — `f"{port}     "` 在 2 位数和 4 位数上宽度不同；
+   **一律用 `{port:<6}` / `{port:>4}` 让格式说明符管对齐**
+
 ### 已完成：GitHub 仓库 ✅
 
 - [x] GitHub 仓库创建：https://github.com/zzx-724/python-for-security
@@ -338,14 +377,27 @@ git commit -m "Day 4: 循环与列表推导式"
 git push
 ```
 
+**⚠️ 国内网络：git 必须单独配代理**（浏览器能开 GitHub ≠ git 能连）
+
+FlClash 等代理软件只对浏览器生效；**git 是命令行程序，不读系统代理设置，默认永远直连**，
+所以会报 `fatal: ... Recv failure: Connection was reset`。已配好（只对 github.com 生效）：
+
+```bash
+git config --global http.https://github.com.proxy http://127.0.0.1:7890
+```
+
+排查顺序：
+1. `git status` → 确认 commit 还在本地（**commit 是本地存档，push 只是发货，断网不丢东西**）
+2. `curl -x http://127.0.0.1:7890 -s -o /dev/null -w "%{http_code}" https://github.com` → 返回 200 说明代理正常
+3. 代理软件关了之后要临时撤销：`git config --global --unset http.https://github.com.proxy`
+
 ### 待完成 ⬜
 
-- [ ] 做完 `practice_02_enumerate_zip.py`（7 道专项练习 + 挑战题）
-- [ ] Day 5：函数 / 参数 / 异常处理（`06_crypto_basics.py` 之前先补函数）
+- [ ] Day 5：函数 / 参数 / 异常处理 —— 痛点已经出现：练习 3/5/6 都是"打印对齐的表"，代码抄了三遍
 
 ---
 
-> 📝 进度：2026-09-18 Day 4 已完成。下次：先做 `practice_02_enumerate_zip.py` 的练习，然后开始 Day 5 函数
+> 📝 进度：2026-09-19 Day 4 及其专项练习全部完成。下次：Day 5 函数
 
 ---
 
