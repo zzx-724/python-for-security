@@ -239,6 +239,7 @@ with open("targets.txt", "r") as f:
 | 09-19 | 修复 GitHub 推送失败 | 给 git 单独配代理，理解"命令行程序不读系统代理" |
 | 10-13 | Day 5 完成：函数 | 定义/调用、return vs print、默认参数、作用域、函数调函数，4 个练习通过 ✅ |
 | 10-13 | 学会"不提交运行产物" | 拦下 targets.txt/scan_report.json，更新 .gitignore ✅ |
+| 10-13 | 配好 SSH 推送 | 生成 ed25519 密钥对，remote 换成 SSH，**以后推送不用开代理** ✅ |
 
 ### Day 1 进度：变量、类型、print/input
 
@@ -417,19 +418,29 @@ git commit -m "Day 4: 循环与列表推导式"
 git push
 ```
 
-**⚠️ 国内网络：git 必须单独配代理**（浏览器能开 GitHub ≠ git 能连）
+**⚠️ 国内网络：GitHub 走 SSH 通道（一劳永逸，不用开代理）**
 
-FlClash 等代理软件只对浏览器生效；**git 是命令行程序，不读系统代理设置，默认永远直连**，
-所以会报 `fatal: ... Recv failure: Connection was reset`。已配好（只对 github.com 生效）：
+直连 GitHub 的 HTTPS（443 端口）会被重置，报 `Recv failure: Connection was reset`。
+但实测 **GitHub 的 SSH 端口（22）没有被封**，所以改用 SSH 彻底绕开。
 
-```bash
-git config --global http.https://github.com.proxy http://127.0.0.1:7890
-```
+| 通道 | 需要开代理吗 |
+|---|:--:|
+| HTTPS | ❌ 每次推送都要开 FlClash |
+| **SSH（现在用的）** | ✅ **不用开** |
 
-排查顺序：
-1. `git status` → 确认 commit 还在本地（**commit 是本地存档，push 只是发货，断网不丢东西**）
-2. `curl -x http://127.0.0.1:7890 -s -o /dev/null -w "%{http_code}" https://github.com` → 返回 200 说明代理正常
-3. 代理软件关了之后要临时撤销：`git config --global --unset http.https://github.com.proxy`
+**已配好：**
+- 密钥对：`~/.ssh/id_ed25519`（私钥，**绝不外发**）/ `~/.ssh/id_ed25519.pub`（公钥，已贴到 GitHub）
+- remote：`git@github.com:zzx-724/python-for-security.git`
+- 验证：`ssh -T git@github.com` → 出现 `Hi zzx-724!` 就是通的
+
+**排查顺序：**
+1. `git status` → 先确认 commit 还在本地（**commit 是本地存档，push 只是发货，断网不丢东西**）
+2. `ssh -T git@github.com` → 测 SSH 通道是否正常
+3. 万一以后改回 HTTPS 地址，才需要代理：
+   `git config --global http.https://github.com.proxy http://127.0.0.1:7890`
+
+> **换电脑怎么办**：新电脑上重新 `ssh-keygen` 生成一对新密钥，把新的公钥贴到 GitHub 即可
+> （一个 GitHub 账户可以贴多把锁，家里/学校/笔记本各贴各的）。
 
 ### 待完成 ⬜
 
