@@ -30,9 +30,10 @@ Python 语法速通      安全方向 Python 工具箱    实战项目积累
 ├── 03_data_structures.py     # Day 3  列表、元组、字典、集合
 ├── 04_scanning_logic.py      # Day 4  循环、推导式、enumerate/zip
 ├── practice_02_enumerate_zip.py  # Day 4 专项练习：enumerate 与 zip
-├── 05_file_io.py             # Day 6  文件读写、JSON/CSV
-├── 06_crypto_basics.py       # Day 5  哈希、Base64、对称加密
-├── 07_info_gather.py         # Day 9  综合项目：简易信息收集工具
+├── 05_functions.py           # Day 5  函数、参数、作用域、return vs print
+├── 06_file_io.py             # Day 6  文件读写、JSON
+├── 07_crypto_basics.py       # Day 7  哈希、Base64、对称加密
+├── 08_info_gather.py         # Day 9  综合项目：简易信息收集工具
 └── PYTHON_LEARNING_PLAN.md   # 完整学习计划与进度追踪
 ```
 
@@ -44,7 +45,8 @@ Python 语法速通      安全方向 Python 工具箱    实战项目积累
 | Day 2 | 字符串操作、切片、编码解码 | ✅ |
 | Day 3 | 列表、元组、字典、集合 | ✅ |
 | Day 4 | 循环、推导式、enumerate/zip | ✅ |
-| Day 5-9 | 函数 / 文件IO / 模块 / 面向对象 / 综合项目 | ⬜ |
+| Day 5 | 函数、参数、作用域、return vs print | ✅ |
+| Day 6-9 | 文件IO / 模块 / 面向对象 / 综合项目 | ⬜ |
 
 详细进度、每个知识点的笔记和踩过的坑，见 [PYTHON_LEARNING_PLAN.md](PYTHON_LEARNING_PLAN.md)。
 
