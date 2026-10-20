@@ -23,9 +23,16 @@ output/
 # 这些文件是跑脚本生成的，不是源代码。真实渗透场景里它们可能含
 # 客户的目标清单和扫描结果，一旦 push 就是重大信息泄露事故。
 targets.txt
+alive.txt
+access.log
 *_report.json
 *_report.csv
 scan_result*.txt
+
+# 【习惯】每写一个新练习，如果它会生成文件，就把文件名加到这里。
+# 判断标准很简单：这个文件是【我手写的】还是【脚本跑出来的】？
+#   手写的（源码、文档、README）  → 提交
+#   脚本跑出来的（结果、日志、目标清单）→ 加进这里
 
 # Windows 系统文件
 Thumbs.db

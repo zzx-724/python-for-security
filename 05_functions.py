@@ -336,7 +336,7 @@ def classify(port):
     database_port = (3306,1433,5432)
     if port in web_port:
         return "web"
-    if port in database_port:
+    elif port in database_port:
         return "db"
     else:
         return "other"
