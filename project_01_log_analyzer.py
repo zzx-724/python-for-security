@@ -108,8 +108,10 @@ def find_suspect_ips(filepath, paths):
    suspects = set()
    with open(filepath, "r", encoding="utf-8") as f:
       for line in f:
+         parts = line.split()
+         if len(parts) < 7:
+            continue
          try:
-            parts = line.split()
             path = parts[6]
             ip = parts[0]
          except IndexError:
