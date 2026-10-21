@@ -81,23 +81,41 @@ REPORT_FILE = "final_report.json"
 #----------工具----------
 def count_by_ip(filepath):
    count = {}
-   with open(filepath, "r", encoding="utf-8") as f:
-      for line in f:   
+   bad_lines = 0
+
+   with open(filepath, "r", encoding="utf-8") as f: 
+      for line in f:
          parts = line.split()
-   
-         if parts[0] in count:
-            count[parts[0]] += 1
+         if len(parts) < 7:
+            bad_lines += 1
+            continue
+
+         try:
+            ip = parts[0]
+            path = parts[6]
+         except IndexError:
+            bad_lines += 1
+            continue
+
+         if ip in count:
+            count[ip] += 1
          else:
-            count[parts[0]] = 1
-   return count
+            count[ip] = 1
+
+   return count, bad_lines
 
 def find_suspect_ips(filepath, paths):
    suspects = set()
    with open(filepath, "r", encoding="utf-8") as f:
-      for line in f:   
-         parts = line.split()
-         if parts[6] in paths:
-            suspects.add(parts[0])
+      for line in f:
+         try:
+            parts = line.split()
+            path = parts[6]
+            ip = parts[0]
+         except IndexError:
+            continue
+         if path in paths:
+            suspects.add(ip)
    return suspects
 
 def sort_counts(counts):
@@ -135,10 +153,16 @@ def save_report(report, save_path):
 
 #----------主函数----------
 def main():
-   count = count_by_ip(LOG_FILE)
-   suspects = find_suspect_ips(LOG_FILE, SENSITIVE_PATH)
+   try:
+      count, bad_lines = count_by_ip(LOG_FILE)
+      suspects = find_suspect_ips(LOG_FILE, SENSITIVE_PATH)
+   except FileNotFoundError as e:
+      print(f"   [!] 拿不到日志文件, 任务无法继续")
+      print(f"   原因: {e}")
+      return
    ranked = sort_counts(count)
    print_table(ranked, suspects, THRESHOLD)
+   print(f"跳过 {bad_lines} 行坏数据")
    report = build_report(ranked, suspects, THRESHOLD)
    save_report(report, REPORT_FILE)
 

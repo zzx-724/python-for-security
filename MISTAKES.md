@@ -335,6 +335,170 @@ with open(path, "w", encoding="utf-8") as f:
 
 ---
 
+## 七、异常处理（Day 7）
+
+### 15. `try` 包在了循环**外面** → 一个坏行终止整个循环
+
+**我写的：**
+```python
+try:
+    for port in ports:
+        good.append(int(port))
+except ValueError:
+    ...
+```
+
+**现象**：只处理了前 2 个，遇到 `"abc"` 之后就不动了。
+
+**原因**：异常不是“跳过这一行”，而是“**一路往外跳，跳到能接住它的 `except`**”。
+`except` 在 `for` 外面，所以跳出去之后**循环已经被抛弃了**，不会回到循环。
+
+**正确：**
+```python
+for port in ports:
+    try:
+        good.append(int(port))
+    except ValueError:
+        ...
+```
+
+**这个错我犯了两次**（练习 A、练习 C）。
+
+---
+
+### 16. `try` 太窄，包不住真正抛错的那一行
+
+**我写的：**
+```python
+with open(filepath) as f:          # ← 抛 FileNotFoundError 的是这里
+    for line in f:
+        try:
+            if line and ...:
+                ...
+        except FileNotFoundError:  # ← 接的是"里面"的错
+            ...
+```
+
+**现象**：程序照样崩，报 `FileNotFoundError`。
+
+**原因**：`open()` 在 `try` 的**上面**。异常从外面飞出去了，`except` 根本看不到。
+
+**正确：** `try` 要包住 `open`。
+
+**规律（15 和 16 是同一条）：**
+> **`try` 的范围必须正好包住“会出事的那几行”。**
+> 太宽 → 一个错终止全部；太窄 → 该接的接不住。
+
+---
+
+### 17. 只写 `try` 不写 `except`
+
+**现象：**
+```
+SyntaxError: expected 'except' or 'finally' block
+```
+
+`try` 后面必须有 `except` 或 `finally`。这不是运行时错误，是**解析阶段**就拒绝了。
+
+---
+
+### 18. `except` 放在永远不会抛该异常的位置
+
+```python
+try:
+    if line and not line.startswith("#"):   # 这里不会抛 FileNotFoundError
+        report.append(line)
+except FileNotFoundError:                    # ← 永远不触发
+```
+
+**Python 不会提醒你。** 不报错、不警告，那个 `except` 就永远沉默。
+
+**这和变量名打错是同一类问题：代码能跑，但做的不是你想要的。**
+
+---
+
+### 19. 校验对象错了：`parts[0]` 能取到 ≠ 这行合法
+
+**我写的：**
+```python
+try:
+    ip = parts[0]
+except IndexError:
+    bad_lines += 1
+```
+
+**现象**：`garbage line` 被当成 IP 统计进去了，`bad_lines` 报 1，实际有 3 行坏的。
+
+**原因**：我只检查了“**我能不能取到 `parts[0]`**”。
+`"garbage line".split()` 有 2 段，`parts[0] = "garbage"` —— 取得到，所以“通过”了。
+
+更阴险的：`192.168.1.77 - - [13/Oct/2026`（截断行）取到的 `parts[0]` 是个**真实的 IP**，
+统计结果看起来完全正确，**但它是坏数据，而且永远不会暴露。**
+
+**正确：** 检查**整行的结构**，而不是你恰好用到的那一格。
+
+```python
+parts = line.split()
+if len(parts) < 7:          # 我要用 parts[6]，就必须至少有 7 段
+    bad_lines += 1
+    continue
+```
+
+**规则：需要第 N 格 → 要求至少 N+1 段。**
+
+**两种判断的分工：**
+| 写法 | 表达的意思 |
+|---|---|
+| `if len(parts) < 7` | “我知道这行该长什么样” —— 明确、可读 |
+| `except IndexError` | “我试了，炸了” —— 兜底，但看不出期望 |
+
+**先 `len` 检查，再 `try` 兜底。** 生产代码里两道都留。
+
+---
+
+### 20. 函数依赖外部变量：`len(raw_ports)` 而不是 `len(ports)`
+
+**我写的：**
+```python
+def read_ports(ports):
+    ...
+    print(f"成功率: {len(good) / len(raw_ports) * 100 :.2f}%")
+#                                ^^^^^^^^^ 外面的变量
+```
+
+**后果**：`read_ports(["22", "abc"])` 会算出 `1/8 = 12.50%`，正确是 `50.00%`。
+
+**原因**：`raw_ports` 永远是文件顶部那 8 个，跟这次传进来什么无关。
+
+**同一类错误在 `count_by_ip` 里也犯过**（用全局 `count` 当容器）。
+
+**正确：** **函数只认参数。** 外面叫什么、有几个，一概不该关心。
+
+---
+
+### 21. `except` 里忘了 `return`，后面用了未赋值的变量
+
+**我写的：**
+```python
+try:
+    count, bad_lines = count_by_ip(LOG_FILE)   # ← 这里抛 FileNotFoundError
+except FileNotFoundError as e:
+    print("拿不到文件")
+    # ← 少了 return
+ranked = sort_counts(count)                    # count 从没被赋值
+```
+
+**现象：**
+```
+UnboundLocalError: cannot access local variable 'count'
+```
+
+**本意是“友好地停下”，结果换了个错误方式崩。**
+
+**正确：** `except` 块的最后加 `return`，干净地结束函数。
+
+---
+
 ## 跑代码前的 6 条自查
 
 写完之后，逐条问自己：
@@ -345,6 +509,8 @@ with open(path, "w", encoding="utf-8") as f:
 4. **参数顺序**：`open` 给的是路径吗？`dump` 给的是数据吗？
 5. **数据结构**：我要的是"有哪些"（set）还是"多少个"（dict）还是"多条记录"（list of dict）？
 6. **输出身份**：我打印的每一行，能不能看出它属于谁？
+7. **`try` 的位置**：它包住的是"会抛错的那一行"吗？在循环里还是循环外？
+8. **校验对象**：我检查的是"整行的结构"，还是"我刚好用到的那一格"？
 
 ---
 
