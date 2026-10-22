@@ -499,7 +499,82 @@ UnboundLocalError: cannot access local variable 'count'
 
 ---
 
-## 跑代码前的 6 条自查
+## 八、重构与多返回值（Day 8）
+
+### 22. `return` 的顺序和解包顺序不看名字，只看位置
+
+**我写的：**
+
+```python
+def load_records(filepath):
+    ...
+    return bad_lines, records              # ← 数量在前
+
+records, bad_lines = load_records(LOG_FILE)   # ← 名字看着对，位置反了
+```
+
+**现象：**
+
+```
+TypeError: 'int' object is not iterable
+```
+
+**原因：** Python 解包只认**位置**，不认名字。
+`records` 拿到的是 `bad_lines`（一个 int），下一行 `for rec in records`
+就等于 `for rec in 2`。
+
+**正确：**
+
+```python
+return records, bad_lines
+records, bad_lines = load_records(LOG_FILE)
+```
+
+**规矩：数据在前，附加信息（计数、状态）在后。两边逐字对一遍。**
+
+**更阴险的情况**：如果两边类型碰巧兼容，程序**不报错**，只是给你一个错的结果 ——
+这和 Day 4「enumerate / zip 变量写反」（见第 4 条、Day 4 踩坑 3）是同一类错误。
+
+---
+
+### 23. 多条记录用 dict 存 → 只剩最后一条
+
+**我写的：**
+
+```python
+records = {}                         # ← 字典
+for line in f:
+    ...
+    records["ip"] = parts[0]
+    records["path"] = parts[6]
+```
+
+**现象**：不报错，但 `records` 里只有**最后一行**，前面 45 行全被覆盖。
+
+**原因**：每一轮都在给同一个键赋值 —— 字典的键唯一，后写的覆盖先写的。
+
+**正确：** 列表装"行"，字典装"字段"。
+
+```python
+records = []
+for line in f:
+    records.append({"ip": parts[0], "path": parts[6]})
+```
+
+**对照第 7 条那张表：**
+
+| 问题 | 用什么 |
+|---|---|
+| 有哪些 IP？ | set |
+| 每个 IP 多少次？ | dict |
+| **一堆多条记录、每条多个字段** | **list of dict** |
+
+**顺带删掉的死代码**：`len(parts) < 7` 已经保证 `parts[6]` 存在，
+后面的 `try/except IndexError` 永远进不去（见第 18 条），留着只会误导读者。
+
+---
+
+## 跑代码前的 9 条自查
 
 写完之后，逐条问自己：
 
@@ -511,6 +586,7 @@ UnboundLocalError: cannot access local variable 'count'
 6. **输出身份**：我打印的每一行，能不能看出它属于谁？
 7. **`try` 的位置**：它包住的是"会抛错的那一行"吗？在循环里还是循环外？
 8. **校验对象**：我检查的是"整行的结构"，还是"我刚好用到的那一格"？
+9. **多返回值**：`return a, b` 和 `x, y = f()` 的位置对上了吗？数据在前、附加信息在后？
 
 ---
 
