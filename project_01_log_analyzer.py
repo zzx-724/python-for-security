@@ -79,45 +79,41 @@ THRESHOLD = 15
 REPORT_FILE = "final_report.json"
 
 #----------工具----------
-def count_by_ip(filepath):
-   count = {}
+def load_records(filepath):
    bad_lines = 0
-
-   with open(filepath, "r", encoding="utf-8") as f: 
-      for line in f:
-         parts = line.split()
-         if len(parts) < 7:
-            bad_lines += 1
-            continue
-
-         try:
-            ip = parts[0]
-            path = parts[6]
-         except IndexError:
-            bad_lines += 1
-            continue
-
-         if ip in count:
-            count[ip] += 1
-         else:
-            count[ip] = 1
-
-   return count, bad_lines
-
-def find_suspect_ips(filepath, paths):
-   suspects = set()
+   records = []
    with open(filepath, "r", encoding="utf-8") as f:
       for line in f:
          parts = line.split()
          if len(parts) < 7:
+            bad_lines += 1
             continue
-         try:
-            path = parts[6]
-            ip = parts[0]
-         except IndexError:
-            continue
-         if path in paths:
-            suspects.add(ip)
+
+         records.append({
+            "ip": parts[0],
+            "path": parts[6]
+         })
+
+   return records, bad_lines
+
+def count_by_ip(records):
+   count = {}
+   for rec in records:
+      ip = rec["ip"]
+      if ip in count:
+         count[ip] += 1
+      else:
+         count[ip] = 1
+
+   return count
+
+def find_suspect_ips(records, paths):
+   suspects = set()
+   for rec in records:
+      ip = rec["ip"]
+      path = rec["path"]
+      if path in paths:
+         suspects.add(ip)
    return suspects
 
 def sort_counts(counts):
@@ -156,12 +152,13 @@ def save_report(report, save_path):
 #----------主函数----------
 def main():
    try:
-      count, bad_lines = count_by_ip(LOG_FILE)
-      suspects = find_suspect_ips(LOG_FILE, SENSITIVE_PATH)
+      records, bad_lines = load_records(LOG_FILE)
    except FileNotFoundError as e:
       print(f"   [!] 拿不到日志文件, 任务无法继续")
       print(f"   原因: {e}")
       return
+   count = count_by_ip(records)
+   suspects = find_suspect_ips(records, SENSITIVE_PATH)
    ranked = sort_counts(count)
    print_table(ranked, suspects, THRESHOLD)
    print(f"跳过 {bad_lines} 行坏数据")
