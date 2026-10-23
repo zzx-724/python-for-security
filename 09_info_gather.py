@@ -1,6 +1,6 @@
 """
-Day 7-8: 阶段一综合项目 — 信息收集工具
-把前面 6 天学的全部组合成一个完整的工具
+Day 9：阶段一综合项目 — 信息收集工具（参考实现）
+把前面 8 天学的全部组合成一个完整的工具
 
 功能：
 1. 从文件读取目标列表
@@ -10,8 +10,8 @@ Day 7-8: 阶段一综合项目 — 信息收集工具
 5. 输出 JSON 报告
 
 命令行用法：
-  python 07_info_gather.py targets.txt
-  python 07_info_gather.py targets.txt -o report.json --timeout 5
+  python 09_info_gather.py targets.txt
+  python 09_info_gather.py targets.txt -o report.json --timeout 5
 """
 
 import json
@@ -29,7 +29,7 @@ from pathlib import Path
 def parse_args():
     """
     解析命令行参数
-    例如：python 07_info_gather.py urls.txt -o output.json --timeout 5
+    例如：python 09_info_gather.py urls.txt -o output.json --timeout 5
     """
     args = {
         "target_file": None,

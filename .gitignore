@@ -34,6 +34,12 @@ scan_result*.txt
 #   手写的（源码、文档、README）  → 提交
 #   脚本跑出来的（结果、日志、目标清单）→ 加进这里
 
+# ⚠️ 密钥文件 —— 绝不提交
+.env
+*.key
+secret*.py
+config_local.py
+
 # Windows 系统文件
 Thumbs.db
 desktop.ini
